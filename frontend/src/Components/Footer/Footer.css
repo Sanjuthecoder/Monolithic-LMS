@@ -1,0 +1,33 @@
+/* Footer.css */
+
+.footer {
+    background-color: #f4f4f4; /* Light background */
+    color: #666; /* Dark gray text */
+    padding: 20px 0;
+    width: 100%;
+    margin-top: auto; /* Pushes the footer to the bottom of the viewport if content is short */
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center; /* Center everything inside */
+    padding: 0 20px;
+}
+
+.copyright {
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+
+.footer-links a {
+    color: #666;
+    text-decoration: none;
+    font-size: 0.9em;
+    margin: 0 10px;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: #000;
+}

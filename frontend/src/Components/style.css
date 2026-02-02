@@ -1,0 +1,145 @@
+/* --- New Flexbox Container for Side-by-Side Layout --- */
+.form-and-table-container {
+    /* Enables flexbox for children (form-section and table-section) */
+    display: flex;
+    /* Centers items vertically (optional) */
+    align-items: flex-start;
+    /* Ensures there is space between the form and the table */
+    gap: 30px;
+    /* Ensures the container takes up most of the screen width */
+    max-width: 1200px;
+    margin: 0 auto;
+    /* Center the whole content */
+}
+
+.form-section {
+    /* Give the form section a fixed width or a percentage */
+    flex: 0 0 400px;
+    /* Do not grow, do not shrink, base width 400px */
+}
+
+.table-section {
+    /* Allow the table section to take up the remaining space */
+    flex-grow: 1;
+}
+
+/* Responsiveness for Landing Page */
+@media (max-width: 900px) {
+    .form-and-table-container {
+        flex-direction: column;
+        width: 100%;
+        padding: 0 15px;
+        /* Add padding to prevent edge touching */
+        box-sizing: border-box;
+    }
+
+    .form-section {
+        flex: 1;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .table-section {
+        width: 100%;
+    }
+}
+
+/* * The rest of your existing CSS (from the previous response) 
+ * should follow here, ensuring the elements inside the form 
+ * are styled correctly.
+ */
+
+/* General Body/Container Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    padding: 20px;
+}
+
+/* --- Form Container --- */
+.movie-form {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Removed max-width here as it is controlled by .form-section */
+    margin-bottom: 20px;
+}
+
+/* --- Labels --- */
+.form-label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.movie-type-label {
+    margin-bottom: 0;
+}
+
+/* --- Text/Date Inputs and Select --- */
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Adjustments for Select */
+.form-select {
+    margin-bottom: 10px;
+}
+
+/* --- Radio Buttons --- */
+.radio-group label {
+    font-weight: normal;
+    margin-right: 15px;
+    display: inline-block;
+}
+
+.form-radio {
+    margin-right: 5px;
+}
+
+/* --- Buttons --- */
+.form-button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+    margin-right: 10px;
+}
+
+.save-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.update {
+    background-color: #d1d140;
+    color: white;
+}
+
+.update:hover {
+    background-color: peru;
+}
+
+.save-button:hover {
+    background-color: #0056b3;
+}
+
+.display-button {
+    background-color: #28a745;
+    color: white;
+}
+
+.display-button:hover {
+    background-color: #1e7e34;
+}

@@ -1,0 +1,53 @@
+/* --- Base Table Style --- */
+table {
+    width: 100%;
+    border-collapse: collapse; /* Merges adjacent borders into a single line */
+    margin-top: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden; /* Helps contain the border-radius */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    font-size: 14px;
+}
+
+/* --- Table Header (thead) --- */
+thead tr {
+    background-color: #007bff; /* Primary blue color for header background */
+    color: white;
+    text-align: left;
+}
+
+th {
+    padding: 12px 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* --- Table Body (tbody) --- */
+/* Styling for all data cells */
+td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd; /* Light separator line */
+    color: #333;
+}
+
+/* Zebra Striping: Alternating row colors for readability */
+tbody tr:nth-child(even) {
+    background-color: #f8f8f8; /* Very light gray for even rows */
+}
+
+/* Hover Effect for Rows (Enhances interactivity) */
+tbody tr:hover {
+    background-color: #e9ecef; /* Slightly darker on hover */
+    cursor: default;
+}
+
+/* Styling for the "No Data" row */
+td[colspan="5"] {
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    color: #6c757d; /* Muted text color */
+    background-color: #fff3cd; /* Light warning-like background */
+}

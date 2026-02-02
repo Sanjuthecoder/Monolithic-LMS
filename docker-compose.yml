@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # ---------------------------------------------------------------------------
+  # 1. DATABASES (Local Development)
+  # ---------------------------------------------------------------------------
+  
+  # MySQL for Auth/Enrollment
+  mysqldb:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dlms_db
+    ports:
+      - "3307:3306" # Mapped to 3307 to avoid conflict with local MySQL
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # MongoDB for Course/Media
+  mongodb:
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # ---------------------------------------------------------------------------
+  # 2. BACKEND SERVICES
+  # ---------------------------------------------------------------------------
+  
+  # Java Monolith (Auth, Course, Media, Enrollment)
+  backend:
+    build: ./backend
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      # Database Config (Pointing to Docker containers)
+      - TIDB_URL=jdbc:mysql://mysqldb:3306/dlms_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - TIDB_USER=root
+      - TIDB_PASSWORD=root
+      - MONGODB_URI=mongodb://mongodb:27017/dlms_mongo_db
+      # JWT Secrets (Inject via .env or keep defaults for dev)
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      # IPFS Keys
+      - PINATA_API_KEY=${PINATA_API_KEY}
+      - PINATA_SECRET_API_KEY=${PINATA_SECRET_API_KEY}
+      # Chatbot Connection
+      - CHATBOT_SERVICE_URL=http://chatbot:8000
+    depends_on:
+      - mysqldb
+      - mongodb
+      - chatbot
+
+  # Python AI Chatbot
+  chatbot:
+    build: ./chatbot
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # Add other python env vars here if needed
+      
+  # ---------------------------------------------------------------------------
+  # 3. FRONTEND
+  # ---------------------------------------------------------------------------
+  
+  frontend:
+    build: ./frontend
+    restart: on-failure
+    ports:
+      - "3000:3000" # Or 5173 depending on Vite
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8080
+      - CHOKIDAR_USEPOLLING=true # For hot reload on Windows
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
+  mongo_data:
