@@ -34,10 +34,26 @@ public class SecurityConfig {
     @Bean
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
-        configuration.setAllowedOrigins(java.util.Arrays.asList("http://localhost:3000"));
+
+        // Get allowed origins from environment variable or default to local + render
+        // frontend
+        String envAllowedOrigins = System.getenv("CORS_ALLOWED_ORIGINS");
+        java.util.List<String> origins = new java.util.ArrayList<>();
+        origins.add("http://localhost:3000");
+        origins.add("https://monolithic-lms.onrender.com");
+
+        if (envAllowedOrigins != null && !envAllowedOrigins.isEmpty()) {
+            String[] envOrigins = envAllowedOrigins.split(",");
+            for (String origin : envOrigins) {
+                origins.add(origin.trim());
+            }
+        }
+
+        configuration.setAllowedOrigins(origins);
         configuration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(java.util.Arrays.asList("*"));
         configuration.setAllowCredentials(true);
+
         org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

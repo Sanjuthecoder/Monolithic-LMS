@@ -50,6 +50,7 @@ This guide covers how to deploy the **DLMS Monolithic Application** using **Rend
     -   `PINATA_API_KEY`: (Your Pinata Key)
     -   `PINATA_SECRET_API_KEY`: (Your Pinata Secret)
     -   `CHATBOT_SERVICE_URL`: **Paste the Chatbot URL from Step 1** (e.g., `https://dlms-chatbot.onrender.com`)
+    -   `CORS_ALLOWED_ORIGINS`: (Optional) Comma-separated list of allowed frontend URLs (e.g., `https://monolithic-lms.onrender.com,http://localhost:3000`). *Note: The code now defaults to including your Render frontend, but this overrides it.*
 5.  **Deploy.**
     -   Once finished, copy the **Backend URL** (e.g., `https://dlms-backend.onrender.com`).
 
