@@ -7,7 +7,7 @@ import Progress from './Progress';
 import { useCourseContext } from '../../Context/CourseContext';
 
 export default function StudentDashboard() {
-    const { activeSection, setActiveSection } = useOutletContext();
+    const { activeSection } = useOutletContext();
     const { enrolledCourses } = useCourseContext();
 
     return (

@@ -12,7 +12,7 @@ export default function StudentLayout() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const location = useLocation();
     const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    // const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
