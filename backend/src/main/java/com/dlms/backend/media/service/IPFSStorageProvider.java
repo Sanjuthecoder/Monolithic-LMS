@@ -23,8 +23,19 @@ public class IPFSStorageProvider implements StorageProvider {
     private final String PINATA_UPLOAD_URL = "https://api.pinata.cloud/pinning/pinFileToIPFS";
     private final String GATEWAY_URL = "https://gateway.pinata.cloud/ipfs/";
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(IPFSStorageProvider.class);
+
     @Override
     public String uploadFile(MultipartFile file) throws IOException {
+        logger.info("Attempting upload to Pinata. File: {}, Size: {}", file.getOriginalFilename(), file.getSize());
+
+        if (pinataApiKey == null || pinataApiKey.isEmpty()) {
+            logger.error("Pinata API Key is MISSING or NULL");
+        } else {
+            logger.info("Pinata API Key is present (Ends with: {})",
+                    pinataApiKey.substring(Math.max(0, pinataApiKey.length() - 4)));
+        }
+
         // Prepare Headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -32,9 +43,7 @@ public class IPFSStorageProvider implements StorageProvider {
         headers.set("pinata_secret_api_key", pinataSecretApiKey);
 
         // Prepare Body
-        // Prepare Body
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        // FIX: Use ByteArrayResource to ensure filename is passed correctly to Pinata
         body.add("file", new org.springframework.core.io.ByteArrayResource(file.getBytes()) {
             @Override
             public String getFilename() {
@@ -48,15 +57,23 @@ public class IPFSStorageProvider implements StorageProvider {
         // Send POST Request using RestTemplate
         RestTemplate restTemplate = new RestTemplate();
         try {
+            logger.info("Sending request to Pinata...");
             ResponseEntity<Map> response = restTemplate.postForEntity(PINATA_UPLOAD_URL, requestEntity, Map.class);
 
+            logger.info("Pinata Response Code: {}", response.getStatusCode());
+
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                return (String) response.getBody().get("IpfsHash");
+                String ipfsHash = (String) response.getBody().get("IpfsHash");
+                logger.info("Upload Successful. IpfsHash: {}", ipfsHash);
+                return ipfsHash;
             } else {
+                logger.error("Pinata Upload Failed. Status: {}, Body: {}", response.getStatusCode(),
+                        response.getBody());
                 throw new IOException("Failed to upload to Pinata: " + response.getStatusCode());
             }
         } catch (Exception e) {
-            throw new IOException("Error communicating with Pinata API", e);
+            logger.error("Exception communicating with Pinata API", e);
+            throw new IOException("Error communicating with Pinata API: " + e.getMessage(), e);
         }
     }
 
