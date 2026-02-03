@@ -44,10 +44,17 @@ public class IPFSStorageProvider implements StorageProvider {
 
         // Prepare Body
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", new org.springframework.core.io.ByteArrayResource(file.getBytes()) {
+        // FIX: Use InputStreamResource to avoid loading entire file into memory (fixes
+        // OOM)
+        body.add("file", new org.springframework.core.io.InputStreamResource(file.getInputStream()) {
             @Override
             public String getFilename() {
                 return file.getOriginalFilename();
+            }
+
+            @Override
+            public long contentLength() throws IOException {
+                return file.getSize();
             }
         });
 
@@ -55,7 +62,14 @@ public class IPFSStorageProvider implements StorageProvider {
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
         // Send POST Request using RestTemplate
+        // Use SimpleClientHttpRequestFactory to enable streaming if possible, though
+        // RestTemplate defaults heavily to buffering.
+        // For standard Multipart, avoiding getBytes() is the biggest win.
         RestTemplate restTemplate = new RestTemplate();
+        org.springframework.http.client.SimpleClientHttpRequestFactory requestFactory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
+        requestFactory.setBufferRequestBody(false); // Enable streaming
+        restTemplate.setRequestFactory(requestFactory);
+
         try {
             logger.info("Sending request to Pinata...");
             ResponseEntity<Map> response = restTemplate.postForEntity(PINATA_UPLOAD_URL, requestEntity, Map.class);
