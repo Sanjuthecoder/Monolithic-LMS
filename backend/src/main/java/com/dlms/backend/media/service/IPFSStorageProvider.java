@@ -20,6 +20,9 @@ public class IPFSStorageProvider implements StorageProvider {
     @Value("${pinata.secret.api.key}")
     private String pinataSecretApiKey;
 
+    @Value("${pinata.jwt:}")
+    private String pinataJwt;
+
     private final String PINATA_UPLOAD_URL = "https://api.pinata.cloud/pinning/pinFileToIPFS";
     private final String GATEWAY_URL = "https://gateway.pinata.cloud/ipfs/";
 
@@ -29,28 +32,31 @@ public class IPFSStorageProvider implements StorageProvider {
     public String uploadFile(MultipartFile file) throws IOException {
         logger.info("Attempting upload to Pinata. File: {}, Size: {}", file.getOriginalFilename(), file.getSize());
 
-        if (pinataApiKey == null || pinataApiKey.isEmpty()) {
-            logger.error("Pinata API Key is MISSING or NULL");
-        } else {
-            logger.info("Pinata API Key is present (Length: {}, Ends with: {})", pinataApiKey.length(),
-                    pinataApiKey.substring(Math.max(0, pinataApiKey.length() - 4)));
-        }
-
-        if (pinataSecretApiKey == null || pinataSecretApiKey.isEmpty()) {
-            logger.error("Pinata Secret Key is MISSING or NULL");
-        } else {
-            // Secret key should be 64 chars (hex) for legacy, or much longer for JWT
-            logger.info("Pinata Secret Key is present (Length: {}).", pinataSecretApiKey.length());
-            if (pinataSecretApiKey.length() < 60) {
-                logger.warn("Pinata Secret Key seems too short! Standard secret keys are usually 64 characters.");
-            }
-        }
-
         // Prepare Headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        headers.set("pinata_api_key", pinataApiKey);
-        headers.set("pinata_secret_api_key", pinataSecretApiKey);
+
+        // Auth Logic: Prefer JWT, fallback to Legacy
+        if (pinataJwt != null && !pinataJwt.isEmpty()) {
+            logger.info("Using Pinata JWT for authentication.");
+            headers.set("Authorization", "Bearer " + pinataJwt);
+        } else {
+            logger.info("Using Legacy Pinata API Keys.");
+
+            if (pinataApiKey == null || pinataApiKey.isEmpty()) {
+                logger.error("Pinata API Key is MISSING or NULL");
+            } else {
+                logger.info("Pinata API Key is present (Ends with: {})",
+                        pinataApiKey.length() > 4 ? pinataApiKey.substring(pinataApiKey.length() - 4) : "***");
+            }
+
+            if (pinataSecretApiKey == null || pinataSecretApiKey.isEmpty()) {
+                logger.error("Pinata Secret Key is MISSING or NULL");
+            }
+
+            headers.set("pinata_api_key", pinataApiKey);
+            headers.set("pinata_secret_api_key", pinataSecretApiKey);
+        }
 
         // Prepare Body
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
