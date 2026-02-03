@@ -32,8 +32,18 @@ public class IPFSStorageProvider implements StorageProvider {
         if (pinataApiKey == null || pinataApiKey.isEmpty()) {
             logger.error("Pinata API Key is MISSING or NULL");
         } else {
-            logger.info("Pinata API Key is present (Ends with: {})",
+            logger.info("Pinata API Key is present (Length: {}, Ends with: {})", pinataApiKey.length(),
                     pinataApiKey.substring(Math.max(0, pinataApiKey.length() - 4)));
+        }
+
+        if (pinataSecretApiKey == null || pinataSecretApiKey.isEmpty()) {
+            logger.error("Pinata Secret Key is MISSING or NULL");
+        } else {
+            // Secret key should be 64 chars (hex) for legacy, or much longer for JWT
+            logger.info("Pinata Secret Key is present (Length: {}).", pinataSecretApiKey.length());
+            if (pinataSecretApiKey.length() < 60) {
+                logger.warn("Pinata Secret Key seems too short! Standard secret keys are usually 64 characters.");
+            }
         }
 
         // Prepare Headers
